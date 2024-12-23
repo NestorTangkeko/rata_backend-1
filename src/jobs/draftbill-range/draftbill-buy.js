@@ -46,7 +46,7 @@ module.exports = () => {
         console.log(scheduler_id+" is complete")
     })
 
-    RATA_DRAFT_BILL_BUY_RANGED.on('failed',async() => {
+    RATA_DRAFT_BILL_BUY_RANGED.on('failed',async(job,err) => {
         await models.scheduler_auto_sync_trckr_tbl.update({
             job_status: 'FAILED',
             error_info: err.message

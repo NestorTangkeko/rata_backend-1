@@ -561,11 +561,12 @@ exports.uploadContract=async(req,res,next)=>{
     
                 return !isInvalid
             })
-            .map(item => {
+            .map(item => {  
+                
                 return{
                     ...item,
                     tariff_rate: round(item.tariff_rate,2),
-                    min_rate: round(item.min_rate,2),
+                    min_rate: String(item.min_rate) === 'null' ? null : round(item.min_rate,2),
                     created_by:req.processor.id,
                     updated_by:req.processor.id
                 }

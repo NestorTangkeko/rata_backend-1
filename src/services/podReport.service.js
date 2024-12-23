@@ -1450,13 +1450,13 @@ const tripValidation = async(draft_bill=[], revenue_leak=[], invoices=[], isRevL
     }
 }
 
-exports.getKronosVehicleTypes = async() => {
+const getKronosVehicleTypes = async() => {
     return await kronos.query('Select * from vehicle_type',{
         type: Sequelize.QueryTypes.SELECT
     })
 }
 
-exports.outlierTagging = async(draft_bill_details = [], vehicleTypes = []) => {
+const outlierTagging = async(draft_bill_details = [], vehicleTypes = []) => {
     let trips  = [];
     
     const groupedDetails = _.groupBy(draft_bill_details, i => i.trip_plan)
@@ -1495,7 +1495,7 @@ exports.outlierTagging = async(draft_bill_details = [], vehicleTypes = []) => {
     return trips
 }
 
-exports.outlierTaggingLeak = async(leak_header=[], leak_details=[], vehicleTypes = []) => {
+const outlierTaggingLeak = async(leak_header=[], leak_details=[], vehicleTypes = []) => {
     let trips  = [];
     const groupedDetails = _.groupBy(leak_header, i => i.trip_no);
     Object.keys(groupedDetails).map(tripPlanNo => {
@@ -1523,7 +1523,7 @@ exports.outlierTaggingLeak = async(leak_header=[], leak_details=[], vehicleTypes
     return trips
 }
 
-exports.joinedInvoices = async({from, to}) => {
+const joinedInvoices = async({from, to}) => {
     const pod = await getPodInvoices({
         from,
         to
@@ -1544,7 +1544,7 @@ exports.joinedInvoices = async({from, to}) => {
     })
 }
 
-exports.joinedHandedOverInvoices = async(trip_date) => {
+const joinedHandedOverInvoices = async(trip_date) => {
     const pod = (await getHandedOverInvoices(trip_date)).filter(item => item.service_type === '2001')
 
     const kronos = await getKronosTrips(pod.map(item => item.trip_no))
@@ -1562,7 +1562,7 @@ exports.joinedHandedOverInvoices = async(trip_date) => {
     })
 }
 
-exports.podSell = async({ 
+const podSell = async({ 
     data = [],
     from = null,
     to = null
@@ -1615,7 +1615,7 @@ exports.podSell = async({
     };
 }
 
-exports.podBuy = async({
+const podBuy = async({
     data = [],
     from = null,
     to = null
@@ -1678,6 +1678,13 @@ module.exports = {
     draftBillWithoutAgg,
     sellValidation,
     assignVendorGroup,
-    draftBillCostAlloc
+    draftBillCostAlloc,
+    getKronosVehicleTypes,
+    outlierTagging,
+    outlierTaggingLeak,
+    joinedInvoices,
+    joinedHandedOverInvoices,
+    podSell,
+    podBuy
 }
 

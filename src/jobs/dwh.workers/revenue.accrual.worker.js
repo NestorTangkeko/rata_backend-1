@@ -86,7 +86,8 @@ module.exports = () => {
         await job.progress('completed')
         done(null,{
             filePath,
-            fileName
+            fileName,
+            transaction_date: trip_date
         });
                 
         }
@@ -121,6 +122,7 @@ module.exports = () => {
             },
             data:{
                 report_status:'DONE',
+                transaction_date: job.returnvalue.transaction_date,
                 file_path: job.returnvalue.filePath,
                 file_name: job.returnvalue.fileName
             }

@@ -223,7 +223,7 @@ exports.sell = async(from, to , job_id = null) => {
         leak_header.push({
             tms_reference_no: leak.tms_reference_no,
             fk_tms_reference_no: leak.fk_tms_reference_no,
-            draft_bill_type: leak.draft_bill_type,
+            draft_bill_type:'SELL',
             rdd:  leak.rdd,
             class_of_store: leak.class_of_store,
             job_id,
@@ -391,7 +391,7 @@ exports.buy = async(from, to, job_id = null) => {
         leak_header.push({
             tms_reference_no: leak.tms_reference_no,
             fk_tms_reference_no: leak.fk_tms_reference_no,
-            draft_bill_type: leak.draft_bill_type,
+            draft_bill_type:'BUY',
             rdd:  leak.rdd,
             class_of_store: leak.class_of_store,
             job_id,
@@ -403,7 +403,7 @@ exports.buy = async(from, to, job_id = null) => {
         leak_details = leak_details.concat(details.map(({id,createdAt, updatedAt,...items}) => ({
             ...items,
             class_of_store: leak.class_of_store,
-            draft_bill_type:'SELL'
+            draft_bill_type:'BUY'
         })))
     }
 

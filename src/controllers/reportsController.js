@@ -1,5 +1,5 @@
 const reportService         = require('../services/reports.service');
-const podReportService      = require('../services/podReport.service');
+const podReportService      = require('../services/podReport.service')
 const podReportExcelService = require('../services/podReport.excel.service');
 const moment                = require('moment');
 const path                  = require('path');
@@ -375,83 +375,86 @@ exports.reverseLogistics = async(req,res,next) => {
 
 exports.dailyPodSell = async(req,res,next) => {
     try{
-        let draft_bill_header  = [];
-        let draft_bill_details = [];
-        let leak_header = [];
-        let leak_details = [];
-
-        const trip_date = req.query.trip_date;
-
-        const data = await podReportService.joinedHandedOverInvoices(trip_date);
         const vehicle_types = await podReportService.getKronosVehicleTypes();
+        res.status(200).json(vehicle_types)
 
-        const draftBill = await podReportService.podSell({
-            data,
-            from:   trip_date,
-            to:     trip_date
-        })
+        // let draft_bill_header  = [];
+        // let draft_bill_details = [];
+        // let leak_header = [];
+        // let leak_details = [];
 
-        for(let {details,...db} of  draftBill.draft_bill){
-            const log_id = uuidv4();
-            draft_bill_header.push({
-                id:log_id,
-                ...db
-            })
+        // const trip_date = req.query.trip_date;
 
-            draft_bill_details = draft_bill_details.concat(details.map(item => ({
-                ...item,
-                fk_header_id: log_id
-            })))
-        }
-        
-        for(let {details,...leak} of  draftBill.revenue_leak){
-            const log_id = uuidv4();
-            leak_header.push({
-                ...leak,
-                id:log_id,
-                draft_bill_type:'SELL',
-            })
-            leak_details = leak_details.concat(details.map(items => ({
-                ...items,
-                fk_header_id: log_id,
-                class_of_store: leak.class_of_store,
-                draft_bill_type:'SELL'
-            })))
-        }
+        // const data = await podReportService.joinedHandedOverInvoices(trip_date);
+        // const vehicle_types = await podReportService.getKronosVehicleTypes();
 
-        //add outlier tagging
-        draft_bill_details = await podReportService.outlierTagging(draft_bill_details,vehicle_types);
-        leak_header = await podReportService.outlierTaggingLeak(leak_header,leak_details,vehicle_types)
-        // const root = global.appRoot;
-        // const fileName = moment().format('YYYYMMDDHHmmss')+'revenue_daily_accrual_report.xlsx'
-        // const filePath = path.join( root,'/assets/reports/accrual/', fileName);
-
-        // await podReportExcelService.podAccrualTemplate({
-        //     header:         draft_bill_header,
-        //     details:        draft_bill_details,
-        //     leak_header:    leak_header,
-        //     leak_details:   leak_details,
-        //     filePath,
-        //     type:'SELL',
-        //     from: moment(trip_date).format('MMMM DD, YYYY'),
-        //     to:moment(trip_date).format('MMMM DD, YYYY'),
+        // const draftBill = await podReportService.podSell({
+        //     data,
+        //     from:   trip_date,
+        //     to:     trip_date
         // })
 
-        // await reportService.createDwhLogs({
+        // for(let {details,...db} of  draftBill.draft_bill){
+        //     const log_id = uuidv4();
+        //     draft_bill_header.push({
+        //         id:log_id,
+        //         ...db
+        //     })
+
+        //     draft_bill_details = draft_bill_details.concat(details.map(item => ({
+        //         ...item,
+        //         fk_header_id: log_id
+        //     })))
+        // }
+        
+        // for(let {details,...leak} of  draftBill.revenue_leak){
+        //     const log_id = uuidv4();
+        //     leak_header.push({
+        //         ...leak,
+        //         id:log_id,
+        //         draft_bill_type:'SELL',
+        //     })
+        //     leak_details = leak_details.concat(details.map(items => ({
+        //         ...items,
+        //         fk_header_id: log_id,
+        //         class_of_store: leak.class_of_store,
+        //         draft_bill_type:'SELL'
+        //     })))
+        // }
+
+        // //add outlier tagging
+        // draft_bill_details = await podReportService.outlierTagging(draft_bill_details,vehicle_types);
+        // leak_header = await podReportService.outlierTaggingLeak(leak_header,leak_details,vehicle_types)
+        // // const root = global.appRoot;
+        // // const fileName = moment().format('YYYYMMDDHHmmss')+'revenue_daily_accrual_report.xlsx'
+        // // const filePath = path.join( root,'/assets/reports/accrual/', fileName);
+
+        // // await podReportExcelService.podAccrualTemplate({
+        // //     header:         draft_bill_header,
+        // //     details:        draft_bill_details,
+        // //     leak_header:    leak_header,
+        // //     leak_details:   leak_details,
+        // //     filePath,
+        // //     type:'SELL',
+        // //     from: moment(trip_date).format('MMMM DD, YYYY'),
+        // //     to:moment(trip_date).format('MMMM DD, YYYY'),
+        // // })
+
+        // // await reportService.createDwhLogs({
+        // //     draft_bill_header,
+        // //     draft_bill_details,
+        // //     leak_header,
+        // //     leak_details,
+        // //     job_id: null
+        // // })
+        
+        // res.status(200).json({
         //     draft_bill_header,
         //     draft_bill_details,
         //     leak_header,
         //     leak_details,
-        //     job_id: null
-        // })
-        
-        res.status(200).json({
-            draft_bill_header,
-            draft_bill_details,
-            leak_header,
-            leak_details,
             
-        })
+        // })
     }
     catch(e){
         next(e)
