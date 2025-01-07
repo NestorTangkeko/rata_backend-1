@@ -18,8 +18,8 @@ router.route('/email')
 router.route('/cron')
 .post(schedulerController.cronTest)
 
-router.post('/daily_accrual_expense',authorize,schedulerController.manualDailyAccrualTriggerExpense)
-router.post('/daily_accrual_revenue',authorize,schedulerController.manualDailyAccrualTriggerRevenue)
+router.post('/daily_accrual_expense',schedulerController.manualDailyAccrualTriggerExpense)
+router.post('/daily_accrual_revenue',schedulerController.manualDailyAccrualTriggerRevenue)
 
 router.post('/draft_bill_sell_range', schedulerController.draftBillSellRange)
 router.post('/draft_bill_buy_range', schedulerController.draftBillBuyRange)

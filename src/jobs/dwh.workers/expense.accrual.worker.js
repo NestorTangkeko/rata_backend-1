@@ -88,7 +88,8 @@ module.exports = () => {
             await job.progress('completed')
             done(null,{
                 filePath,
-                fileName
+                fileName,
+                transaction_date: trip_date
             });            
         }
         catch(e){
@@ -97,6 +98,7 @@ module.exports = () => {
     })
 
     DWH_ACC_EXPENSE.on('active', async(job) => {
+        
         const isJobExists = await reportService.getReportLog({
             id: job.id
         })
@@ -116,12 +118,13 @@ module.exports = () => {
     })
 
     DWH_ACC_EXPENSE.on('completed', async(job) => {
-        console.log(job.id)
+       
         await reportService.updateReportLog({
             filter:{
                 id: job.id,
             },
             data:{
+                transaction_date: job.returnvalue.transaction_date,
                 report_status:'DONE',
                 file_path: job.returnvalue.filePath,
                 file_name: job.returnvalue.fileName
@@ -134,6 +137,7 @@ module.exports = () => {
 
     DWH_ACC_EXPENSE.on('failed', async(job,err) => {
         console.log(err)
+        console.log(job.id)
         await reportService.updateReportLog({
             filter:{
                 id: job.id,

@@ -1,4 +1,4 @@
-const models = require('../models/rata');
+    const models = require('../models/rata');
 const moment = require('moment');
 const {v4:uuidv4} = require('uuid');
 const Queue = require('../jobs/queues/queues');
@@ -271,16 +271,6 @@ exports.manualDailyAccrualTriggerExpense = async(req,res,next) => {
             removeOnComplete:true
         })
 
-        // if(type === 'SELL') {
-
-     
-        // }
-        // else{
-
-   
-
-        // }
-
         res.end();
 
     }
@@ -314,7 +304,7 @@ exports.cronTest = async(req,res,next) => {
 exports.draftBillSellRange = async(req,res,next) => {
     try{
         const {date} = req.body;
-        const from = moment(date).subtract(7,'days').format('YYYY-MM-DD')
+        const from = moment(date).subtract(30,'days').format('YYYY-MM-DD')
         const to =  moment(date).format('YYYY-MM-DD')
 
         await Queue.RATA_DRAFT_BILL_SELL_RANGED.add({

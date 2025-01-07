@@ -24,6 +24,9 @@ class report_tbl extends Model{
             file_path:{
                 type: DataTypes.STRING
             },
+            transaction_date: {
+                type: DataTypes.STRING
+            },
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
             created_by: {
