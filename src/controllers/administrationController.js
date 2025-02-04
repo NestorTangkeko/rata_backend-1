@@ -1,6 +1,8 @@
 const models = require('../models/rata')
 const useGlobalFilter = require('../helpers/filters');
 const bcrypt = require('bcryptjs');
+const userService = require('../services/user.service');
+const emailService= require('../services/emailService/emailService');
 
 exports.getRoles = async(req,res,next) => {
     try{ 
@@ -12,7 +14,7 @@ exports.getRoles = async(req,res,next) => {
         } = req.query;
 
         const globalFilter = useGlobalFilter.defaultFilter({
-            model:models.role_tbl.rawAttributes,
+            model:models.role_tbl.getAttributes(),
             filters:{
                 search
             }
@@ -275,13 +277,27 @@ exports.createUser = async(req,res,next) =>{
 
         if(getUser) return res.status(400).json({message:'User exists!'})
 
+        const password = await userService.randomCharGenerator(36)
+        const hashedPassword = bcrypt.hashSync(password, 10)
+
+        const user_data = {
+            ...data,
+            is_reset: 1,
+            status:'ACTIVE',
+            password: hashedPassword,
+            created_by: req.processor.id
+        }
+
         await models.user_tbl.createData({
-            data: {
-                ...data,
-                status:'ACTIVE',
-                password: bcrypt.hashSync('secret',10),
-                created_by: req.processor.id
-            }
+            data:user_data
+        })
+
+        ///send email
+        await emailService.sendEmailToUser({
+            to: data.email,
+            subject: '[RATA - New Account]',
+            data:`<p>Email: ${data.email}</p>
+            <p>Password; ${password}</p>`
         })
 
         res.status(200).end();

@@ -57,6 +57,7 @@ exports.login = async (req,res,next) => {
                 last_name: user.last_name,
                 role_name: role?.role_name,
                 role_id: role?.role_id,
+                is_reset: user.is_reset,
                 access
             }
         })

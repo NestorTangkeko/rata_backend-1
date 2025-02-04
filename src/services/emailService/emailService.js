@@ -18,6 +18,8 @@ exports.sendEmail = async({
 }) => {
     try{
 
+        
+
         const emails = await models.scheduler_email_tbl.getData({
             where:{
                 scheduler_id,
@@ -36,4 +38,18 @@ exports.sendEmail = async({
     catch(e){
         throw e
     }
+}
+
+//send email to user
+exports.sendEmailToUser = async ({
+    subject,
+    to,
+    data
+}) => {
+    await transporter.sendMail({
+        to, 
+        subject,
+        html: data
+    })
+
 }
