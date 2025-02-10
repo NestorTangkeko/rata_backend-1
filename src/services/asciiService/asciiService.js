@@ -11,7 +11,6 @@ const costAllocationService = require('../costalloc.service');
 
 const {Sequelize} = models;
 
-
 exports.asciiSalesOrder = async (data) => {
     try{
         return data.map(header => {
@@ -539,4 +538,12 @@ exports.getSalesOrder = async(draftBill) => {
     })
     
     return data
+}
+
+exports.deleteAPISession = async(username) => {
+    return await asciiModel.sequelize.query('delete from user_session where username = :username', {
+        replacements:{
+            username
+        }
+    })
 }

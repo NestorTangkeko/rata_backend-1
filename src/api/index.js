@@ -15,6 +15,6 @@ router.use('/administration',   require('./administration'))
 router.use('/select',           require('./select'))
 router.use('/reports',          require('./reports'))
 router.use('/cr-upload',        require('./cr-upload'))
-
+router.use('/so-upload',        require('./so-upload'))
 
 module.exports = router;
