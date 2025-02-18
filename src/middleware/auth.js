@@ -18,16 +18,17 @@ exports.authorize = async(req,res,next) => {
         }
         
         jwt.verify(token,jwtSecret,async (error,result) => {
-            if(error){
+            
+            if(error ){
                 //delete the redis session
-                await redis.del(`rata:session:${token}`)
+                await redis.del(`rata:session:${result?.id}`)
                 return next(new APIError(err))            
             }
 
-            const session = await redis.json.get(`rata:session:${token}`)
+            const session = await redis.json.get(`rata:session:${result.id}`)
 
             if(!session){
-                await redis.del(`rata:session:${token}`)
+                await redis.del(`rata:session:${result.id}`)
                 return next(new APIError(err))
             }
             
@@ -60,6 +61,19 @@ exports.revokeAccess = async(req,res,next) => {
         res.status(200).end()
     }
     catch(e) {
+        
+        next(e)
+    }
+}
+
+exports.lockAccount = async(req,res,next) => {
+    try{
+        const id = req.sessions.id;
+
+      console.log('test')
+      next()
+    }
+    catch(e){
         next(e)
     }
 }

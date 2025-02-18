@@ -15,6 +15,9 @@ router.route('/user')
 .get(authorize,controller.getUsers)
 .post(authorize, controller.createUser)
 
+router.route('/user/password')
+.put(authorize, controller.updatePassword, revokeAccess);
+
 router.route('/user/:id/:type')
 .put(authorize, controller.updateUser, revokeAccess)
 

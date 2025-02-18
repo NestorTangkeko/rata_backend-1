@@ -46,7 +46,10 @@ class user_tbl extends Model {
             },
             createdAt:Sequelize.DATE,
             updatedAt:Sequelize.DATE,
-            deletedAt:Sequelize.DATE
+            deletedAt:Sequelize.DATE,
+            is_reset: DataTypes.TINYINT,
+            is_lock: DataTypes.TINYINT,
+            password_expiry: DataTypes.DATE 
         },
         {
             freezeTableName:true,
