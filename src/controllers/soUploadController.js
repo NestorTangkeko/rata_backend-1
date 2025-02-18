@@ -78,7 +78,7 @@ exports.uploadSO = async(req,res,next) => {
 
         await stx.commit();
 
-        res.set('Content-disposition',`cr_upload_result.xlsx`);
+        res.set('Content-disposition',`so_upload_result.xlsx`);
         res.set('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');    
         res.send(xlsx)
     }
