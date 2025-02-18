@@ -71,10 +71,7 @@ exports.login = async (req,res,next) => {
         if(!getUser) {
             throw createHttpError(400, errorMessage)
         }
-        
-        //check if account is expired
-        //if(moment(getUser.password_expiry).isBefore(moment())) throw createHttpError(400, 'Your password has expired. Kindly set a new password to continue')
-            
+             
         //get user redis session
         if(getUser.is_lock === 1) {
             throw createHttpError(400, 'You reached the maximum number of login retries.')
@@ -192,8 +189,6 @@ exports.session = async(req,res,next) => {
         const id = req.processor.id;
 
         const data = await redis.json.get(`rata:session:${id}`);
-
-        console.log(data)
 
         if(!data) return res.status(401).json({message: 'No Active Session Found!'})
         const {access,...user} = data;

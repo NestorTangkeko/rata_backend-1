@@ -18,9 +18,10 @@ exports.authorize = async(req,res,next) => {
         }
         
         jwt.verify(token,jwtSecret,async (error,result) => {
-            if(error){
+            
+            if(error ){
                 //delete the redis session
-                await redis.del(`rata:session:${result.id}`)
+                await redis.del(`rata:session:${result?.id}`)
                 return next(new APIError(err))            
             }
 
