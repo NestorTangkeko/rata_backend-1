@@ -3,6 +3,7 @@ const useGlobalFilter = require('../helpers/filters');
 const bcrypt = require('bcryptjs');
 const userService = require('../services/user.service');
 const emailService= require('../services/emailService/emailService');
+const moment = require('moment');
 
 exports.getRoles = async(req,res,next) => {
     try{ 
@@ -285,6 +286,7 @@ exports.createUser = async(req,res,next) =>{
             is_reset: 1,
             status:'ACTIVE',
             password: hashedPassword,
+            is_lock: 0,
             created_by: req.processor.id
         }
 
@@ -295,9 +297,19 @@ exports.createUser = async(req,res,next) =>{
         ///send email
         await emailService.sendEmailToUser({
             to: data.email,
-            subject: '[RATA - New Account]',
-            data:`<p>Email: ${data.email}</p>
-            <p>Password; ${password}</p>`
+            subject: '[RATA: New Account Registration]',
+            data:`<p>Dear ${data.first_name},</p>
+            <p>Below are your initial login credentials to RATA:</p>
+            <p>RATA Link: ${process.env.RATA_URL}</p>
+            <p>User ID: ${data.email}</p>
+            <p>Temporary Password: ${password}</p>
+            <br/>
+            <p>Please log in and follow the instructions to
+            secure your account by changing your
+            password.</p>
+            <br/>
+            <p>Regards, 
+            RATA IT Team</p>`
         })
 
         res.status(200).end();
@@ -349,20 +361,84 @@ exports.updateUser = async(req,res,next) => {
                 return next()
             }
             case 'password': {
+                const getUser = await userService.getUser({
+                    id
+                })
+
+                const newPassword = await userService.randomCharGenerator(36)
+
                 await models.user_tbl.updateData({
                     data:{
-                        password:bcrypt.hashSync('secret',10),
+                        password: bcrypt.hashSync(newPassword,10),
+                        is_reset: 1,
                         updated_by: req.processor.id
+                    },
+                    where:{
+                        id
+                    }
+                });
+
+                await emailService.sendEmailToUser({
+                    to: getUser.email,
+                    subject: '[RATA: Reset Account]',
+                    data:`<p>Dear ${getUser.first_name},</p>
+                    <p>Below are your credentials to access RATA and reset your account:</p>
+                    <p>RATA Link: ${process.env.RATA_URL}</p>
+                    <p>User ID: ${getUser.email}</p>
+                    <p>Temporary Password: ${newPassword}</p>
+                    <br/>
+                    <p>Please log in and follow the instructions to
+                    secure your account by changing your
+                    password.</p>
+                    <br/>
+                    <p>Regards, 
+                    RATA IT Team</p>`
+                })
+            
+                req.sessions = {
+                    id: id
+                };
+                
+                return next()
+            }
+            case 'unlock' : {
+                const getUser = await userService.getUser({
+                    id
+                })
+                const newPassword = await userService.randomCharGenerator(36)
+                await userService.updateUser({
+                    data:{
+                        is_lock: 0,
+                        is_reset: 1,
+                        updated_by: req.processor.id,
+                        password: bcrypt.hashSync(newPassword,10),
                     },
                     where:{
                         id
                     }
                 })
 
+                await emailService.sendEmailToUser({
+                    to: getUser.email,
+                    subject: '[RATA: Unlock Account]',
+                    data:`<p>Dear ${getUser.first_name},</p>
+                    <p>Below are your credentials to access RATA and reset your account:</p>
+                    <p>RATA Link: ${process.env.RATA_URL}</p>
+                    <p>User ID: ${getUser.email}</p>
+                    <p>Temporary Password: ${newPassword}</p>
+                    <br/>
+                    <p>Please log in and follow the instructions to
+                    secure your account by changing your
+                    password.</p>
+                    <br/>
+                    <p>Regards, 
+                    RATA IT Team</p>`
+                })
+
                 req.sessions = {
                     id: id
                 }
-                
+
                 return next()
             }
             default: return res.status(400).json({
@@ -374,3 +450,49 @@ exports.updateUser = async(req,res,next) => {
         next(e)
     }
 }
+
+exports.updatePassword = async (req,res,next) => {
+    try{
+        const id = req.processor.id;
+        const {
+            oldPassword,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        const getUser = await userService.getUser({
+            id
+        })
+        //compare old password to current password
+        if(!getUser) return res.status(400).json({message: 'User not found!'});
+
+        if(!bcrypt.compareSync(oldPassword, getUser.password)) return res.status(400).json({message: 'Invalid old password'}) 
+
+        //compare old password to new password
+        if(oldPassword === newPassword) {
+            return res.status(400).json({message: 'New password must not match the password'})
+        }
+        //update user password and is_reset field
+
+        await userService.updateUser({
+            data:{
+                password: bcrypt.hashSync(newPassword, 10),
+                password_expiry: moment().add(90, 'days').format('YYYY-MM-DD HH:mm:ss'),
+                is_reset: 0
+            },
+            filters:{
+                id
+            }
+        })
+
+        req.sessions = {
+            id: id
+        };
+    
+        next();
+    }
+    catch(e){
+        next(e)
+    }
+}
+
