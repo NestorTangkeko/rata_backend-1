@@ -216,15 +216,18 @@ exports.getPaginatedSO = async(query) => {
             Object.keys(filters).map(key => {
                 
                 if(key === 'SO_DATE'){
-                    const dates = filters.CR_DATE.split(',')
+                    const dates = filters.SO_DATE.split(',')
                     const from = moment(dates[0]).isValid() ? dates[0] : null;
                     const to = moment(dates[1]).isValid() ? dates[1] : null;
                 
                     if (from && to) {
-                        return where.CR_DATE = {
+                        return where.SO_DATE = {
                             [Sequelize.Op.between]: [from,to]
                         }
                     }
+                }
+                else if(key === 'SO_STATUS') {
+                    return where['STATUS'] = filters[key]
                 }
                 else return where[key] = filters[key]
             })
@@ -236,6 +239,7 @@ exports.getPaginatedSO = async(query) => {
                 }
             })
         
+
             const {count,rows} = await models.so_upload_header_tbl.findAndCountAll({
                 include:[
                     {
@@ -259,6 +263,7 @@ exports.getPaginatedSO = async(query) => {
                     const {user_tbl,...newItem} = item;
                     return {
                         ...newItem,
+                        SO_STATUS: newItem.STATUS,
                         uploaded_by: user_tbl.first_name+' '+user_tbl.last_name
                     }
                 }),
