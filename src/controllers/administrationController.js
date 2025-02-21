@@ -405,7 +405,9 @@ exports.updateUser = async(req,res,next) => {
                 const getUser = await userService.getUser({
                     id
                 })
+
                 const newPassword = await userService.randomCharGenerator(36)
+
                 await userService.updateUser({
                     data:{
                         is_lock: 0,
@@ -413,7 +415,7 @@ exports.updateUser = async(req,res,next) => {
                         updated_by: req.processor.id,
                         password: bcrypt.hashSync(newPassword,10),
                     },
-                    where:{
+                    filters:{
                         id
                     }
                 })
