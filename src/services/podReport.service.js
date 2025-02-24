@@ -318,6 +318,135 @@ const getHandedOverInvoices = async(trip_date) => {
     })
 }
 
+const getHandedOverInvoicesRange = async(start_trip_date, end_trip_date) => {
+    const header =  await pod.query(`               
+        Select     
+        c.bookingRequestNo	    'tms_reference_no',    
+        b.tripPlanNo			'trip_no',    
+        b.trip_date			    'trip_date',    
+        b.locationCode		    'location',    
+        b.tripStatus			'trip_status',    
+        b.actual_vendor		    'trucker_id',    
+        b.actual_vehicle_type   'vehicle_type',    
+        b.actual_vehicle_id	    'vehicle_id',    
+        b.vendorId			    'planned_trucker',    
+        b.truckType			    'planned_vehicle_type',    
+        b.plateNo				'planned_vehicle_id',    
+        c.serviceType			'service_type',    
+        c.sub_service_type	    'sub_service_type',  
+        c.invoiceNo             'invoice_no',    
+        c.deliveryDate		    'rdd',    
+        c.drNo				    'dr_no',    
+        c.shipmentManifest	    'shipment_manifest',    
+        c.customerCode		    'principal_code',    
+        c.ship_from			    'stc_from',    
+        c.shipToCode			'stc_to',    
+        c.brStatus			    'br_status', 
+        c.deliveryStatus		'delivery_status',    
+        c.rudStatus			    'rud_status',    
+        c.reasonCode			'reason_code',    
+        d.is_billable			'is_billable',    
+        c.date_cleared		    'cleared_date'    
+        from trip_br_dtl_tbl a    
+        left join trip_plan_hdr_tbl b on a.tripPlan = b.tripPlanNo    
+        left join booking_request_hdr_tbl c on a.brNo = c.bookingRequestNo    
+        left join reason_codes_tbl d on c.reasonCode = d.code    
+        where cast(b.trip_date as date) between :start_trip_date and :end_trip_date 
+        and c.brStatus in ('VERIFIED_COMPLETE','HANDED_OVER_TO_TRUCKER' ,'RETURNED_BY_TRUCKER')
+        and b.tripStatus <> 'SHORT_CLOSED'
+        and a.isDeleted <> 1
+    `,{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements:{
+            start_trip_date, end_trip_date
+        }
+    })
+    .then(result => {
+        return result.map(item => ({
+            ...item,
+            status: item.br_status+'_'+item.rud_status
+        }))
+        //.filter(item => item.status !== 'VERIFIED_COMPLETE_CLEARED')
+    })
+
+    const details = await pod.query(`
+        Select distinct    
+        a.tripPlan	      'trip_no',    
+        a.brNo			  'br_no',    
+        a.deliveryStatus  'delivery_status',
+        b.class_of_stores 'class_of_store',    
+        b.uom,   
+        b.planned_qty,    
+        b.planned_weight ,
+        b.planned_cbm,    
+        b.planned_qty       'actual_qty',    
+        b.planned_weight    'actual_weight',    
+        b.planned_cbm       'actual_cbm',    
+        b.return_qty
+        from (    
+        select     
+        ax.tripPlan,    
+        ax.brNo,
+        cx.deliveryStatus
+        from trip_br_dtl_tbl ax    
+        inner join trip_plan_hdr_tbl bx on ax.tripPlan = bx.tripPlanNo and ax.isDeleted = 0    
+        left join booking_request_hdr_tbl cx on ax.brNo = cx.bookingRequestNo and ax.isDeleted = 0    
+        where brNo in (:br)
+        ) a    
+            
+        OUTER APPLY (    
+            Select     
+            bx.class_of_stores,    
+            ax.uom,    
+            SUM(ax.planned_qty) 'planned_qty',    
+            SUM(ax.weight) 'planned_weight',    
+            SUM(ax.cbm) 'planned_cbm',    
+            SUM(ax.actual_qty) 'actual_qty',    
+            SUM(ax.actual_weight) 'actual_weight',    
+            SUM(ax.actual_cbm) 'actual_cbm',    
+            SUM(ax.return_qty) 'return_qty',    
+            SUM(ax.damaged_qty) 'damaged_qty',    
+            SUM(ax.variance_qty) 'variance_qty',    
+            SUM(ax.short_landed_qty) 'short_landed_qty',    
+            SUM(ax.lost_qty) 'lost_qty'    
+            from dispatch_item_dtl ax    
+            left join booking_request_dtl_tbl bx on ax.br_no = bx.bookingRequestNo and ax.sku_code = bx.skuCode    
+            where ax.trip_plan_id = a.tripPlan and ax.br_no = a.brNo    
+            group by ax.uom,bx.class_of_stores    
+        ) b`
+    ,{
+        type: Sequelize.QueryTypes.SELECT,
+        replacements:{
+            br: header.length === 0 ? '' : header.map(item => item.tms_reference_no)
+        }
+    })
+
+    const shipPoints = await models.ship_point_tbl.findAll({
+        where:{
+            is_active: 1,
+            stc_code: _.uniq(header.map(item => item.stc_from).concat(header.map(item => item.stc_to)))
+        }
+    }).then(result => JSON.parse(JSON.stringify(result)))
+   
+    return header.map(item => {
+        const invoiceDetails = details.filter(a => a.br_no === item.tms_reference_no);
+        const ship_point_from = shipPoints.find(a => String(a.stc_code).toLowerCase() === String(item.stc_from).toLowerCase())
+        const ship_point_to = shipPoints.find(a => String(a.stc_code).toLowerCase() === String(item.stc_to).toLowerCase())
+        const redel_remarks = String(item.invoice_no).split('|')
+        
+        return {
+            ...item,
+            is_billable: _.isNull(item.is_billable) ? 1 : item.is_billable,
+            ship_point_from: ship_point_from ?? null,
+            ship_point_to: ship_point_to ?? null,
+            invoice_no: redel_remarks[0],
+            redel_remarks: typeof redel_remarks[1] === 'undefined' ? null : redel_remarks[1],
+            details: invoiceDetails,
+        }
+    })
+}
+
+
 const getContract = async ({
     from,
     to,
@@ -1562,6 +1691,24 @@ const joinedHandedOverInvoices = async(trip_date) => {
     })
 }
 
+const joinedHandedOverInvoicesRange = async(start_trip_date, end_trip_date) => {
+    const pod = (await getHandedOverInvoicesRange(start_trip_date, end_trip_date)).filter(item => item.service_type === '2001')
+
+    const kronos = await getKronosTrips(pod.map(item => item.trip_no))
+
+    return pod.map(item => {
+        const vehicleData = kronos.find(a => a.trip_log_id === item.trip_no)
+
+        return {
+            ...item,
+            trucker_id:             vehicleData?.trucker_id ?? null,
+            vehicle_type:           vehicleData?.vehicle_type ?? null,
+            vehicle_id:             vehicleData?.vehicle_id ?? null,
+            kronos_trip_status:     vehicleData?.trip_status ?? null
+        }
+    })
+}
+
 const podSell = async({ 
     data = [],
     from = null,
@@ -1685,6 +1832,7 @@ module.exports = {
     joinedInvoices,
     joinedHandedOverInvoices,
     podSell,
-    podBuy
+    podBuy,
+    joinedHandedOverInvoicesRange
 }
 

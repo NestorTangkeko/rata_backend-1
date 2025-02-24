@@ -56,6 +56,20 @@ module.exports = {
         settings:{
             lockDuration:1800000
         }
-    })
+    }),
+
+    DWH_MTD_ACC_REVENUE: new Bull('rata:dwh:mtd-accrual-revenue', {
+        redis: redisConfig,
+        settings:{
+            lockDuration:1800000
+        }
+    }),
+
+    DWH_MTD_ACC_EXPENSE: new Bull('rata:dwh:mtd-accrual-expense', {
+        redis: redisConfig,
+        settings:{
+            lockDuration:1800000
+        }
+    }),
     
 }
