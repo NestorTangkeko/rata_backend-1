@@ -350,3 +350,38 @@ exports.draftBillBuyRange = async(req,res,next) => {
         next(e)
     }
 }
+
+exports.manualDailyMTDAccrualTriggerRevenue = async(req,res,next) => {
+    try{
+        const {trip_date} = req.body;
+        await Queue.DWH_MTD_ACC_REVENUE.add({},
+        {
+            jobId:uuidv4(),
+            removeOnFail:true,
+            removeOnComplete:true
+         })
+        res.end();
+    }
+    catch(e){
+        next(e)
+    }
+}
+
+exports.manualDailyMTDAccrualTriggerExpense = async(req,res,next) => {
+    try{
+        const {trip_date} = req.body;
+
+        await Queue.DWH_MTD_ACC_EXPENSE.add({},
+        {
+            jobId:uuidv4(),
+            removeOnFail:true,
+            removeOnComplete:true
+        })
+
+        res.end();
+
+    }
+    catch(e){
+        next(e)
+    }
+}

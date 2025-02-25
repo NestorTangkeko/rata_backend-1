@@ -21,6 +21,9 @@ router.route('/cron')
 router.post('/daily_accrual_expense',schedulerController.manualDailyAccrualTriggerExpense)
 router.post('/daily_accrual_revenue',schedulerController.manualDailyAccrualTriggerRevenue)
 
+router.post('/daily_mtd_accrual_expense',schedulerController.manualDailyAccrualTriggerExpense)
+router.post('/daily_mtd_accrual_revenue',schedulerController.manualDailyAccrualTriggerRevenue)
+
 router.post('/draft_bill_sell_range', schedulerController.draftBillSellRange)
 router.post('/draft_bill_buy_range', schedulerController.draftBillBuyRange)
 
