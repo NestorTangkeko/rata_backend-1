@@ -158,7 +158,10 @@ exports.transportReplanBuy = async(req,res,next) => {
                         required:false
                     },
                     {
-                        model: models.tranport_rev_leak_dtl_tbl
+                        model: models.tranport_rev_leak_dtl_tbl,
+                        where:{
+                            draft_bill_type: 'BUY'
+                        }
                     }
                 ]
             },
@@ -242,7 +245,10 @@ exports.transportReplanSell = async(req,res,next) => {
                     },
                     {
                         model: models.tranport_rev_leak_dtl_tbl,
-                        required:false
+                        required:false,
+                        where:{
+                            draft_bill_type: 'SELL'
+                        }
                     }
                 ]
             },
