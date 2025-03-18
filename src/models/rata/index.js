@@ -45,6 +45,7 @@ const cost_alloc_setup_tbl          = require('./cost_alloc_setup_tbl');
 const vehicle_types_tbl             = require('./vehicle_types_tbl');
 const cr_upload_details_tbl = require('./cr_upload_details_tbl');
 const contract_tariff_history_tbl   = require('./contract_tariff_history_tbl');
+const user_logs_tbl = require('./user_logs_tbl');
 
 
 const sequelize = new Sequelize({
@@ -53,6 +54,7 @@ const sequelize = new Sequelize({
 
 const models = {
     user_tbl:                       user_tbl.init(sequelize),
+    user_logs_tbl:                  user_logs_tbl.init(sequelize),
     role_tbl:                       role_tbl.init(sequelize),
     role_access_tbl:                require('./role_access_tbl').init(sequelize),
     role_modules_tbl:               role_modules_tbl.init(sequelize),

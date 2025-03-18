@@ -107,6 +107,9 @@ exports.login = async (req,res,next) => {
             access: getUser.access
         })
 
+        //add logs to login
+        await userService.createLoginLogs(getUser.id);
+
         res.status(200).json({
             token
         })

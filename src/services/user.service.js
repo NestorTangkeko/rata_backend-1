@@ -69,3 +69,10 @@ exports.lockUserAccount = async({
 
   await redis.json.set(redis_id, '$', data)
 }
+
+exports.createLoginLogs = async(user_id='') => {
+  await models.user_logs_tbl.create({
+    fk_user_id: user_id,
+    login_time: moment().format('YYYY-MM-DD HH:mm:ss')
+  })
+}
