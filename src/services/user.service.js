@@ -1,6 +1,7 @@
 const { redis } = require('../../config');
 const models = require('../models/rata');
 const createHttpError = require('http-errors');
+const moment = require('moment');
 
 exports.randomCharGenerator = async(length) => {
     let result = '';
