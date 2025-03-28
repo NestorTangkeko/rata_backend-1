@@ -68,7 +68,7 @@ exports.asciiSalesOrder = async (data) => {
                     ITEM_CODE:      header.ascii_item_code,
                     LINE_NO:        1,
                     LOCATION_CODE:  header.ascii_loc_code,
-                    UM_CODE:        ['2002','2003','2004','2008','DF FCL'].includes(header.service_type) ? 'lot' : header.min_billable_unit,
+                    UM_CODE:        ['2002','2003','2004','2008','2011','2012','DF FCL'].includes(header.service_type) ? 'lot' : header.min_billable_unit,
                     QUANTITY:       header.customer === '10005' ? quantity : quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,
                     //quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,    
                     //QUANTITY:       quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,    
