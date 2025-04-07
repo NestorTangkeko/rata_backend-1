@@ -11,7 +11,6 @@ const costAllocationService = require('../costalloc.service');
 
 const {Sequelize} = models;
 
-
 exports.asciiSalesOrder = async (data) => {
     try{
         return data.map(header => {
@@ -20,7 +19,7 @@ exports.asciiSalesOrder = async (data) => {
             //removed the standard rounding of numbers;
             const SO_AMT  = Number(header.total_charges);
 
-            const quantity = ['2002','2003','2004','2008'].includes(details[0].service_type) ? 1 : round(_.sumBy(details,(i)=>{
+            const quantity = ['2002','2003','2004','2008','2011','DF FCL'].includes(details[0].service_type) ? 1 : round(_.sumBy(details,(i)=>{
                 if(String(header.min_billable_unit).toLowerCase() === 'cbm'){
                     return Number(i.actual_cbm)
                 }
@@ -69,7 +68,7 @@ exports.asciiSalesOrder = async (data) => {
                     ITEM_CODE:      header.ascii_item_code,
                     LINE_NO:        1,
                     LOCATION_CODE:  header.ascii_loc_code,
-                    UM_CODE:        ['2002','2003','2004','2008'].includes(header.service_type) ? 'lot' : header.min_billable_unit,
+                    UM_CODE:        ['2002','2003','2004','2008','2011','DF FCL'].includes(header.service_type) ? 'lot' : header.min_billable_unit,
                     QUANTITY:       header.customer === '10005' ? quantity : quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,
                     //quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,    
                     //QUANTITY:       quantity < Number(header.min_billable_value) ? Number(header.min_billable_value) : quantity,    
@@ -539,4 +538,12 @@ exports.getSalesOrder = async(draftBill) => {
     })
     
     return data
+}
+
+exports.deleteAPISession = async(username) => {
+    return await asciiModel.sequelize.query('delete from user_session where username = :username', {
+        replacements:{
+            username
+        }
+    })
 }

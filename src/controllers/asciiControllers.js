@@ -23,7 +23,6 @@ const login = async() => {
             api_key:apiKey
         })
         .then(result => {
-            
             return result.data.access_token
         })
 
