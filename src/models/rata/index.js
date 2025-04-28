@@ -49,6 +49,9 @@ const so_upload_header_tbl = require('./so_upload_header_tbl');
 const so_upload_details_tbl = require('./so_upload_details_tbl');
 const so_upload_errors_tbl = require('./so_upload_errors_tbl');
 const user_logs_tbl = require('./user_logs_tbl');
+const jv_header_tbl = require('./jv_header_tbl');
+const jv_detail_tbl = require('./jv_detail_tbl');
+const jv_ref_series_tracker = require('./jv_ref_series_tracker');
 
 
 const sequelize = new Sequelize({
@@ -123,7 +126,11 @@ const models = {
 
     so_upload_header_tbl:           so_upload_header_tbl.init(sequelize),
     so_upload_details_tbl:          so_upload_details_tbl.init(sequelize),
-    so_upload_errors_tbl:           so_upload_errors_tbl.init(sequelize)
+    so_upload_errors_tbl:           so_upload_errors_tbl.init(sequelize),
+
+    jv_header_tbl:                  jv_header_tbl.init(sequelize),
+    jv_detail_tbl:                  jv_detail_tbl.init(sequelize),
+    jv_ref_series_tracker:          jv_ref_series_tracker.init(sequelize),
 }
 
 //associations
