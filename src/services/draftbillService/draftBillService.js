@@ -33,6 +33,7 @@ const models = require('../../models/rata');
 const moment = require('moment')
 const round = require('../../helpers/round');
 const costAllocation = require('../costalloc.service');
+const {v4: uuid} = require('uuid');
 
 const {Op} = Sequelize;
 
@@ -1114,6 +1115,7 @@ const createDraftBill = async({draft_bill, revenue_leak,invoices, contract_type,
                 data: revenue_leak_details.map(item => {
                     return {
                         ...item,
+                        id: uuid(),
                         draft_bill_type: contract_type
                     }
                 }),
