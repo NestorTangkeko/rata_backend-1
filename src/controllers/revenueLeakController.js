@@ -100,12 +100,13 @@ exports.getRevenueLeaks = async(req,res,next) => {
 exports.getRevenueLeaksDetails = async(req,res,next) => {
     try{
         const {br_no} = req.params;
-
+        const {draft_bill_type} = req.query;
         if(!br_no) throw 'Booking Number is required';
 
         const data = await models.tranport_rev_leak_dtl_tbl.findAll({
             where:{
-                br_no
+                br_no,
+                draft_bill_type
             }
         })
 
