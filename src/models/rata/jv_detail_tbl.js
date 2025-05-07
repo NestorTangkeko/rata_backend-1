@@ -46,6 +46,14 @@ class jv_detail_tbl extends Model {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            amount: {
+                type: DataTypes.DECIMAL(18, 9),
+                allowNull: false,
+            },
+            status: {
+                type: DataTypes.ENUM('For Creation', 'For Reversal'),
+                allowNull: false,
+            },
             cr_number: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -55,16 +63,12 @@ class jv_detail_tbl extends Model {
                 allowNull: true,
             },
             actual_charges: {
-                type: DataTypes.DECIMAL(15, 2),
+                type: DataTypes.DECIMAL(18, 9),
                 allowNull: true,
             },
             jv_create_ref_no: {
                 type: DataTypes.STRING,
                 allowNull: true,
-            },
-            amount: {
-                type: DataTypes.DECIMAL(18, 9),
-                allowNull: false,
             },
             created_by:{type: DataTypes.STRING(50)},
             updated_by:{type: DataTypes.STRING(50)},

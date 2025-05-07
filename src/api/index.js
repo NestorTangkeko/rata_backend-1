@@ -16,6 +16,7 @@ router.use('/select',           require('./select'))
 router.use('/reports',          require('./reports'))
 router.use('/cr-upload',        require('./cr-upload'))
 router.use('/so-upload',        require('./so-upload'))
-router.use('/jv-creation',     require('./jv-creation'))
+router.use('/jv-creation',      require('./jv-creation'))
+router.use('/jv-reversal',      require('./jv-reversal'))
 
 module.exports = router;

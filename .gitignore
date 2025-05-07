@@ -1,4 +1,4 @@
-assets\reports\jv\*
+assets/reports/jv/*
 node_modules
 .env
 package-lock.json

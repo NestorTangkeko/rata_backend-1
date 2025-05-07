@@ -34,10 +34,6 @@ class jv_header_tbl extends Model {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            status: {
-                type: DataTypes.ENUM('For Creation', 'For Reversal'),
-                allowNull: false,
-            },
             created_by:{type: DataTypes.STRING(50)},
             updated_by:{type: DataTypes.STRING(50)},
             createdAt:Sequelize.DATE,
