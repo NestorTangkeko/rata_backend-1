@@ -12,5 +12,8 @@ router.route('/reverse')
 router.route('/export/jvc/:jv_ref')
 .get(authorize, controllers.exportJVC)
 
+router.route('/export/jvr/:jv_ref')
+.get(authorize, controllers.exportJVR)
+
 module.exports = router;
 

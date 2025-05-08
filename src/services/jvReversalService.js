@@ -27,13 +27,20 @@ const getJVReversal = async (query) => {
             return where+=`AND g.status = '${filters.jv_status}' \n`
         }   
         if(key === 'jv_actual_vendor') {
-            
+            return where+=`AND h.ascii_vendor_code = '${filters.jv_actual_vendor}' \n`
         }
-        if(key === 'jv_number') {
-            return where+=`AND g.jv_ref_no = '${filters.jv_number}' \n`
+        if(key === 'jv_create_ref_no') {
+            return where+=`AND (g.jv_ref_no = '${filters.jv_create_ref_no}' \n
+            OR g.jv_create_ref_No = '${filters.jv_create_ref_no}') \n`
         }
-        if(key === 'jv_cr') {
-            
+        if(key === 'jv_actual_cr') {
+            console.log("filters.jv_actual_cr: ", filters.jv_actual_cr)
+            if (filters.jv_actual_cr === true) {
+                return where+=`AND h.draft_bill_no IS NOT NULL \n` ;
+            }
+            else {
+                return where+=`AND h.draft_bill_no IS NULL \n`;
+            }
         }
     })
 
@@ -56,6 +63,12 @@ const getJVReversal = async (query) => {
                 a.total_charges         LIKE '%${search}%' OR
                 g.jv_ref_no             LIKE '%${search}%' OR
                 g.status                LIKE '%${search}%' OR
+                h.draft_bill_no         LIKE '%${search}%' OR
+                h.draft_bill_date       LIKE '%${search}%' OR
+                h.trip_no               LIKE '%${search}%' OR
+                h.ascii_vendor_code     LIKE '%${search}%' OR
+                h.vehicle_type          LIKE '%${search}%' OR
+                h.total_charges         LIKE '%${search}%' OR
                 g.jv_create_ref_no      LIKE '%${search}%' 
             )
         `
@@ -612,17 +625,17 @@ const getExportDetailDataJVR = async(jv_ref) => {
                 ref_code            AS jvr_tms_reference_no,
                 destination_port    AS jvr_ship_from,
                 delivery_location   AS jvr_ship_to,
-                principal           AS jvr_customer,
+                principal           AS jvr_customer_code,
                 container_size      AS jvr_vehicle_type,
                 container_no        AS jvr_vehicle_id,
-                supplier_code       AS jvr_vendor,
+                supplier_code       AS jvr_vendor_code,
                 amount              AS jvr_total_charges,
                 cr_number           AS jv_actual_cr,
                 actual_vendor       AS jv_actual_vendor,
                 actual_charges      AS jv_actual_charges,
-                jv_create_ref_no    AS jv_reverse_ref_no
+                jv_create_ref_no    AS jv_create_ref_no
             FROM jv_detail_tbl
-            WHERE jv_ref_no = '${jv_ref}'
+            WHERE jv_create_ref_no = '${jv_ref}'
             ORDER BY createdAt DESC;`,
             {
                 type: Sequelize.QueryTypes.SELECT,
@@ -631,6 +644,7 @@ const getExportDetailDataJVR = async(jv_ref) => {
                 return result.map((row) => ({
                     ...row,
                     total_charges: row.total_charges !== null ? parseFloat(row.total_charges) : null,
+                    actual_charges: row.actual_charges !== null ? parseFloat(row.actual_charges) : null,
                 }));
 			});
 	} catch (e) {
