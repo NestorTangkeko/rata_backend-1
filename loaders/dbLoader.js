@@ -16,7 +16,7 @@ module.exports = async() => {
         })();
 
         //background worker v2
-        // jobs();
+        jobs();
 
         await models.sequelize.authenticate().then(() => {
             console.log('Connected to RB DB')
