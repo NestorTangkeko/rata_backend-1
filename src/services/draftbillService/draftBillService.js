@@ -33,6 +33,7 @@ const models = require('../../models/rata');
 const moment = require('moment')
 const round = require('../../helpers/round');
 const costAllocation = require('../costalloc.service');
+const {v4: uuid} = require('uuid');
 
 const {Op} = Sequelize;
 
@@ -1114,6 +1115,7 @@ const createDraftBill = async({draft_bill, revenue_leak,invoices, contract_type,
                 data: revenue_leak_details.map(item => {
                     return {
                         ...item,
+                        id: uuid(),
                         draft_bill_type: contract_type
                     }
                 }),
@@ -1194,7 +1196,10 @@ const tripValidation = async(draft_bill=[], revenue_leak=[], invoices=[], isRevL
                 job_id: invoice.job_id,
                 is_draft_bill: 0,
                 trip_date: invoice.trip_date,
-                details: isRevLeak ? invoice.tranport_rev_leak_dtl_tbls : invoice.helios_invoices_dtl_tbls.filter(i => i.class_of_store === dtl.class_of_store)
+                details: isRevLeak ? invoice.tranport_rev_leak_dtl_tbls : invoice.helios_invoices_dtl_tbls.filter(i => i.class_of_store === dtl.class_of_store).map(item => ({
+                    ...item,
+                    br_no: tms_reference_no
+                }))
             }
         }))
     })

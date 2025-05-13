@@ -7,7 +7,7 @@ class tranport_rev_leak_dtl_tbl extends Model {
                 allowNull: false,
                 primaryKey: true,
                 type: DataTypes.UUID,
-                defaultValue: DataTypes.UUIDV4
+                //defaultValue: DataTypes.UUIDV4
             },
             draft_bill_type:{
                 type: DataTypes.STRING
@@ -16,7 +16,6 @@ class tranport_rev_leak_dtl_tbl extends Model {
                 type: DataTypes.STRING
             },
             br_no:{
-                primaryKey:true,
                 type: DataTypes.STRING
             },
             class_of_store:{

@@ -19,6 +19,7 @@ const {
 const models = require('../models/rata');
 const _ = require('lodash');
 const moment = require('moment');
+const {v4: uuid} = require('uuid');
 
 const getMaxDraftBillCount = async() => {
     return await models.draft_bill_hdr_tbl.max('draft_bill_no', {
@@ -104,7 +105,10 @@ const createDraftBill = async({contract_type, draft_bill_header, draft_bill_deta
             ignoreDuplicates:true
         })
 
-        await models.tranport_rev_leak_dtl_tbl.bulkCreate(leak_details, {
+        await models.tranport_rev_leak_dtl_tbl.bulkCreate(leak_details.map(item => ({
+            ...item,
+            id: uuid()
+        })), {
             transaction,
             ignoreDuplicates:true
         })

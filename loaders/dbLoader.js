@@ -12,7 +12,6 @@ module.exports = async() => {
             redis.on("error", (error) => console.error(`Error : ${error}`));
             await redis.connect(); 
             await redisIndex.userSessionIndex(redis);
-            // await redisIndex.testIndex(redis);
         })();
 
         //background worker v2
