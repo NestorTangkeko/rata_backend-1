@@ -34,11 +34,10 @@ const getJVReversal = async (query) => {
             OR g.jv_create_ref_No = '${filters.jv_create_ref_no}') \n`
         }
         if(key === 'jv_actual_cr') {
-            console.log("filters.jv_actual_cr: ", filters.jv_actual_cr)
-            if (filters.jv_actual_cr === true) {
+            if (filters?.jv_actual_cr === "with_cr") {
                 return where+=`AND h.draft_bill_no IS NOT NULL \n` ;
             }
-            else {
+            else if (filters?.jv_actual_cr === "no_cr") {
                 return where+=`AND h.draft_bill_no IS NULL \n`;
             }
         }

@@ -250,7 +250,7 @@ const getJVDraftBillV2 = async (query) => {
 
         ${where}
 
-        ORDER BY b.createdAt DESC
+        ORDER BY a.draft_bill_no DESC
 
         LIMIT ${parseInt(page) * parseInt(totalPage)}, ${parseInt(totalPage)} 
         ;`, {
