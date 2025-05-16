@@ -1198,7 +1198,7 @@ const tripValidation = async(draft_bill=[], revenue_leak=[], invoices=[], isRevL
                 trip_date: invoice.trip_date,
                 details: isRevLeak ? invoice.tranport_rev_leak_dtl_tbls : invoice.helios_invoices_dtl_tbls.filter(i => i.class_of_store === dtl.class_of_store).map(item => ({
                     ...item,
-                    br_no: tms_reference_no
+                    br_no: dtl.tms_reference_no
                 }))
             }
         }))
