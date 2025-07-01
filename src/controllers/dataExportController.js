@@ -131,7 +131,7 @@ exports.exportDraftBill = async(req,res,next) => {
         const getDraftBills = await models.draft_bill_hdr_tbl.getData({
             where:{
                 [type]:{
-                    [Op.between] : [from,to]
+                    [Op.between] : [moment(from).format('YYYY-MM-DD'),moment(to).format('YYYY-MM-DD')]
                 }
             },
             options:{
