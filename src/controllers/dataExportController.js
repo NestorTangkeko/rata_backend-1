@@ -1,5 +1,6 @@
 const models = require('../models/rata');
 const {Sequelize:{Op}} = models;
+const moment = require('moment');
 
 const dataExportService = require('../services/dataExportService');
 
