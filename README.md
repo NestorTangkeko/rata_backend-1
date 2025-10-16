@@ -23,7 +23,8 @@ The above commands clone the repository and install the dependencies.
 | HTTP status code and message using [http-status](https://github.com/adaltas/node-http-status)               |
 | Authentication using [AWS Cognito](https://aws.amazon.com/cognito/) and [JSON Web Tokens](https://jwt.io/)  |
 | An easy-to-use multi SQL dialect ORM for Node.js using [Sequelize](https://sequelize.org)                   |
-| Redis-based queue for Node [Bull](https://github.com/OptimalBits/bull)                                      |                                                                                                
+| Redis-based queue for Node [Bull](https://github.com/OptimalBits/bull)   
+| Crontab for man                                                                                                
 
 
 ### Setting up Dev
@@ -148,4 +149,7 @@ The following conditions will prevent an invoice from successfully completing th
 * **No Formula or Condition Match** (Tariff calculation failed to match a rule)
 * **Invalid Total Charges Result** (Calculated charge amount is zero, negative, or otherwise invalid)
 * **Trnsaction Error** (When an Invoice is matched with 2 different draft bills)
+
+# Use Crontab Guru for generating cron expressions
+* [CrontTab Guru](https://crontab.guru/)
 
