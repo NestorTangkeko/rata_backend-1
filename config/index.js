@@ -1,4 +1,3 @@
-
 const redis = require('./redis');
 const ioredis = require('./ioredis');
 const vars = require('./vars');
