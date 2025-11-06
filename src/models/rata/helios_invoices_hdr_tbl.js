@@ -83,6 +83,9 @@ class  helios_invoices_hdr_tbl extends Model {
             is_billable:            {
                 type: DataTypes.TINYINT
             },      
+            is_billable_buy:        {
+                type: DataTypes.TINYINT
+            },
             is_processed_sell:      {
                 type: DataTypes.TINYINT
             },

@@ -2,6 +2,7 @@ const {
     getContract, 
     groupByTripDate,
     getBillableInvoices, 
+    getBillableInvoicesBuy,
     assignContract, 
     assignTariff,
     draftBillCostAlloc
@@ -355,7 +356,7 @@ exports.buy = async(from, to, job_id = null) => {
 
     for(let trip_date of Object.keys(raw_data)) {
         let raw = await formatByClassOfStore({invoices:raw_data[trip_date]})
-        raw             = await getBillableInvoices(raw)
+        raw             = await getBillableInvoicesBuy(raw)
         revenue_leak    = revenue_leak.concat(raw.revenue_leak)
 
         raw             = await assignContract({ invoices: raw.data, contracts})

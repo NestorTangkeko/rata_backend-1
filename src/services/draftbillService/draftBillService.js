@@ -222,7 +222,44 @@ const getBillableInvoices = async({invoices}) => {
             
             return {
                 ...header,
-                revenue_leak_reason: 'NOT BILLABLE'
+                revenue_leak_reason: 'NOT BILLABLE REVENUE'
+            }
+        })
+
+        revenue_leak = revenue_leak.concat(notBillable)
+
+        const noShipPoint = invoices.filter(item => !(item.ship_point_to && item.ship_point_from)).map(item => {
+            const {ship_point_from,ship_point_to,...header} = item;
+            return {
+                ...header,
+                revenue_leak_reason: 'NO SHIP POINT INFORMATION'
+            }
+        })
+
+        revenue_leak = revenue_leak.concat(noShipPoint)
+
+        return {
+            data,
+            revenue_leak
+        }
+    }
+    catch(e){
+        throw e
+    }
+}
+
+const getBillableInvoicesBuy = async({invoices}) => {
+    try{
+        let revenue_leak = [];
+        const data = invoices.filter(item => item.is_billable_buy === 1 && item.ship_point_from && item.ship_point_to)
+
+        const notBillable = invoices.filter(item => item.is_billable_buy === 0)
+        .map(item => {
+            const {ship_point_from,ship_point_to,...header} = item;
+
+            return {
+                ...header,
+                revenue_leak_reason: 'NOT BILLABLE EXPENSE'
             }
         })
 
@@ -1264,7 +1301,7 @@ const buy = async ({
         })
 
         //2. Identify Billable invoices
-        data = await getBillableInvoices({invoices:raw_data});
+        data = await getBillableInvoicesBuy({invoices:raw_data});
         revenue_leak = revenue_leak.concat(data.revenue_leak);
 
         //3. Assign Contract
@@ -1393,7 +1430,7 @@ const replanBuy = async({invoices,trip_date, user=null}) => {
             }
         })
 
-        data = await getBillableInvoices({invoices});
+        data = await getBillableInvoicesBuy({invoices});
         revenue_leak = revenue_leak.concat(data.revenue_leak);
 
         data = await assignContract({
@@ -1533,6 +1570,7 @@ module.exports = {
 
     formatByClassOfStore,
     getBillableInvoices,
+    getBillableInvoicesBuy,
     assignContract,
     assignTariff,
     draftBillWithAgg,

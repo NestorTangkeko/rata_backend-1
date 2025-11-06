@@ -425,7 +425,39 @@ const getBillableInvoices = async(invoices) => {
         
         return {
             ...header,
-            revenue_leak_reason: 'NOT BILLABLE'
+            revenue_leak_reason: 'NOT BILLABLE REVENUE'
+        }
+    });
+
+    const noShipPoint = invoices.filter(item => !(item.ship_point_to && item.ship_point_from)).map(item => {
+        const {ship_point_from,ship_point_to,...header} = item;
+        return {
+            ...header,
+            revenue_leak_reason: 'NO SHIP POINT INFORMATION'
+        }
+    });
+
+    revenue_leak = revenue_leak.concat(noShipPoint,notBillable);
+
+    return {
+        data,
+        revenue_leak
+    }
+
+}
+
+
+const getBillableInvoicesBuy = async(invoices) => {
+    let revenue_leak = [];
+    const data = invoices.filter(item => (item.is_billable_buy === 1 || item.is_billable_buy) && item.ship_point_from && item.ship_point_to)
+
+    const notBillable = invoices.filter(item => !item.is_billable_buy)
+    .map(item => {
+        const {ship_point_from,ship_point_to,...header} = item;
+
+        return {
+            ...header,
+            revenue_leak_reason: 'NOT BILLABLE EXPENSE'
         }
     });
 
@@ -1672,6 +1704,7 @@ module.exports = {
     groupByTripDate,
     formatByClassOfStore,
     getBillableInvoices,
+    getBillableInvoicesBuy,
     assignContract,
     assignTariff,
     draftBillWithAgg,

@@ -71,6 +71,7 @@ const getBookingRequest = async ({
             c.rudStatus			    'rud_status',    
             c.reasonCode			'reason_code',    
             d.is_billable			'is_billable',    
+            d.is_billable_buy		'is_billable_buy',
             c.date_cleared		    'cleared_date'    
             from trip_br_dtl_tbl a    
             left join trip_plan_hdr_tbl b on a.tripPlan = b.tripPlanNo    
