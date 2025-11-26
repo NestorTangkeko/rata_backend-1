@@ -3,6 +3,8 @@ const {Sequelize:{Op}} = models;
 const moment = require('moment');
 
 const dataExportService = require('../services/dataExportService');
+const moment = require('moment');
+
 
 exports.exportInvoice = async(req,res,next) => {
     try{
@@ -240,6 +242,149 @@ exports.exportDraftBill = async(req,res,next) => {
         res.send(xlsx)
      
         
+    }
+    catch(e){
+        next(e)
+    }
+}
+
+exports.exportDraftBillV2 = async(req,res,next) => {
+    try{
+        const {
+            draft_bill_date,
+            trip_date,
+            ...filters
+        } = req.query;
+
+        const headers=[];
+        let db_details=[];
+        let cost_alloc_details=[];
+        const dateFilters = {};
+
+        if (draft_bill_date && draft_bill_date.trim() != '') {
+            const [from, to] = draft_bill_date.split(',');
+            dateFilters.draft_bill_date = {
+                [Op.between] : [moment(from).format('YYYY-MM-DD'),moment(to).format('YYYY-MM-DD')]
+            }
+        }
+
+        if (trip_date && trip_date.trim() != '') {
+            const [from, to] = trip_date.split(',');
+            dateFilters.trip_date = {
+                [Op.between] : [moment(from).format('YYYY-MM-DD'),moment(to).format('YYYY-MM-DD')]
+            }
+        }
+
+        const getDraftBills = await models.draft_bill_hdr_tbl.getData({
+            where:{
+                ...filters,
+                ...dateFilters,
+            },
+            options:{
+                include: [
+                    {
+                        model: models.draft_bill_details_tbl,
+                        required: false,
+                        as:'details',
+                        include:[
+                            {
+                                model: models.helios_invoices_hdr_tbl,
+                                as:'invoice',
+                                include: [
+                                    {
+                                        model: models.principal_tbl,
+                                        required:false
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        model: models.service_type_tbl,
+                        required: false
+                    },
+                    {
+                        model: models.draft_bill_cost_alloc_tbl,
+                        as:'cost_allocation_details',
+                        required: false
+                    }
+                ]
+            }
+        })
+
+        const headerLabel = {
+            draft_bill_no:      'Draft Bill No.',
+            customer:           'Customer',
+            contract_type:      'Contract Type',
+            draft_bill_date:    'Draft Bil Date',
+            contract_id:        'Contract ID',
+            tariff_id:          'Tariff ID',
+            trip_no:            'Trip No.',
+            vendor:             'Vendor',
+            location:           'Location',
+            rate:               'Contracted Rate',
+            min_rate:           'Contracted Min. Rate',
+            vehicle_type:       'Vehicle Type',
+            stc_from:           'Ship From',
+            stc_to:             'Ship To',
+            min_billable_value: 'Min. Billable Value',
+            max_billable_value: 'Max. Billable Value',
+            min_billable_unit:  'Min. Billable Unit',
+            total_charges:      'Total Charges',
+            status:             'Status',
+            condition:          'Condition',
+            formula:            'Formula',
+            service_type:       'TMS Service Type',
+            ascii_service_type: 'Ascii Service Type',
+            sub_service_type:   'Sub Service Type',
+            job_id:             'Job ID',
+            createdAt:          'Created Date',
+            updatedAt:          'Updated Date',
+        };
+
+        getDraftBills.map(item => {
+            const {details,created_by,updated_by,service_type_tbl,cost_allocation_details,...header} = item
+
+            headers.push({
+                ...header,
+                ascii_service_type: service_type_tbl?.ascii_service_type
+            })
+
+            db_details = db_details.concat(details.map(item =>{
+                const {invoice,...itms} = item;
+                const principal_code = invoice?.principal_tbl?.principal_code;
+
+                return {
+                    ...itms,
+                    planned_vehicle_type: invoice.planned_vehicle_type,
+                    principal_code,
+                    cleared_date: invoice.cleared_date,
+                    trucker_cleared_date: invoice.trucker_cleared_date
+                }
+            }))
+
+            cost_alloc_details = cost_alloc_details.concat(cost_allocation_details.map(item => {
+                return {
+                    ...item,
+                    location: header.location,
+                    contract_type:header.contract_type,
+                    vehicle_type: header.vehicle_type,
+                }
+            }))
+        })
+
+        const xlsx = await dataExportService.generateExcel({
+            headers: [headerLabel].concat(headers),
+            details: db_details,
+            cost_allocation_details: cost_alloc_details
+        })
+
+        res.set('Content-disposition',`transport_draft_bill.xlsx`);
+        res.set('Content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        res.send(xlsx)
+
+
     }
     catch(e){
         next(e)
