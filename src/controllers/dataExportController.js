@@ -3,7 +3,7 @@ const {Sequelize:{Op}} = models;
 const moment = require('moment');
 
 const dataExportService = require('../services/dataExportService');
-const moment = require('moment');
+//const moment = require('moment');
 
 
 exports.exportInvoice = async(req,res,next) => {
