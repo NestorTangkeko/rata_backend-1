@@ -33,6 +33,35 @@ class vendor_group_dtl_tbl extends Model {
         })
     }
 
+    static async paginated({
+        filters,
+        order,
+        page,
+        totalPage
+    }) {
+        
+        return await this.findAndCountAll({
+            where:{
+                ...filters
+            },
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`(
+                            Select vendor_description
+                            from vendor_tbl
+                            where vendor_tbl.vendor_id = vendor_group_dtl_tbl.vg_vendor_id
+                        )`),
+                        'vg_vendor_desc'
+                    ],
+                ]
+            },
+            offset: parseInt(page) * parseInt(totalPage),
+            limit:parseInt(totalPage),
+            order
+        })
+    }
+    
     static async getData ({options,where}) {
         return await this.findAll({
             where:{

@@ -9,6 +9,16 @@ router.route('/vendors')
 .get(authorize,controllers.getVendor)
 .put(authorize,controllers.updateVendor)
 
+router.route('/vendor-groups')
+.get(authorize,controllers.getVendorGroup)
+
+router.route('/vendor-groups/details/:id')
+.get(authorize,controllers.getVendorGroupDetails)
+
+router.route('/vendor-groups/mapping/:id')
+.get(authorize,controllers.getVendorGroupMapping)
+.put(authorize,controllers.updateVendorGroupMapping)
+
 router.route('/algorithm')
 .get(authorize,controllers.getAlgorithm)
 .post(authorize, controllers.createAlgorithm)
