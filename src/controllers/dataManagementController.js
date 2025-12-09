@@ -67,6 +67,139 @@ exports.updateVendor = async(req,res,next) => {
     }
 }
 
+exports.getVendorGroup = async (req,res,next) => {
+    try{
+
+        const {
+            page,
+            totalPage,
+            search,
+            ...filters
+        } = req.query;
+
+        const where = {};
+
+        const globalFilter = useGlobalFilter.defaultFilter({
+            model:models.vendor_group_tbl.rawAttributes,
+            filters:{
+                search
+            }
+        })
+        
+        const {count,rows} = await models.vendor_group_tbl.paginated({
+            filters:{
+                ...globalFilter
+            },
+            order:[['createdAt','DESC']],
+            page,
+            totalPage,
+        })
+
+        res.status(200).json({
+            data:rows,
+            rows:count,
+            pageCount: Math.ceil(count/totalPage)
+        })
+
+    }   
+    catch(e){
+        next(e)
+    }
+}
+
+exports.getVendorGroupDetails = async(req,res,next) => {
+    try{
+        const {id} = req.params;
+
+        const data = await models.vendor_group_tbl.findOne({
+            where:{
+                vg_code: id
+            },
+        })
+    
+        if(!data) {
+            return res.status(404).json({
+                message: 'Vendor Group not found'
+            })
+        }
+
+
+        res.status(200).json(data)
+    }
+    catch(e){
+        next(e)
+    }
+}
+
+exports.getVendorGroupMapping = async(req,res,next) => {
+    try{
+        const {id} = req.params;
+        const {
+            page,
+            totalPage,
+            search,
+        } = req.query;
+        
+        const globalFilter = useGlobalFilter.defaultFilter({
+            model:models.vendor_group_dtl_tbl.rawAttributes,
+            filters:{
+                search
+            }
+        })
+        const {count,rows} = await models.vendor_group_dtl_tbl.paginated({
+            filters:{
+                vg_code: id,
+                ...globalFilter,
+            },
+            order:[['createdAt','DESC']],
+            page,
+            totalPage,
+        })
+
+        res.status(200).json({
+            data:rows,
+            rows:count,
+            pageCount: Math.ceil(count/totalPage)
+        })
+    }
+    catch(e){
+        next(e)
+    }
+}
+
+exports.updateVendorGroupMapping = async(req,res,next) => {
+    try{
+        const {id} = req.params;
+        const {action, ...data} = req.body;
+
+        if (action && action ==='remove') {
+            await models.vendor_group_dtl_tbl.destroy({
+                where: {
+                    vg_code: id,
+                    ...data
+                }
+            })
+        } else {
+            await models.vendor_group_dtl_tbl.updateData({
+                data: {
+                    ...data,
+                    updated_by: req.processor.id
+                },
+                where:{
+                    vendor_id
+                }
+            })
+        }
+        
+        res.status(200).json({
+            message:'Success'
+        })
+    }
+    catch(e){
+        next(e)
+    }
+}
+
 exports.getGeo = async(req,res,next) => {
     try{
         const {
