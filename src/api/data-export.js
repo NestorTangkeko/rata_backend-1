@@ -12,6 +12,9 @@ transportRouter.route('/invoice')
 transportRouter.route('/draft-bill')
 .post(authorize,controller.exportDraftBill)
 
+transportRouter.route('/draft-bill-v2')
+.post(authorize,controller.exportDraftBillV2)
+
 transportRouter.route('/revenue-leak')
 .post(authorize,controller.exportRevenueLeak)
 
