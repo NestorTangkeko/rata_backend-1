@@ -32,6 +32,23 @@ class vendor_group_tbl extends Model {
         })
     }
 
+    static async paginated({
+        filters,
+        order,
+        page,
+        totalPage
+    }) {
+        
+        return await this.findAndCountAll({
+            where:{
+                ...filters
+            },
+            offset: parseInt(page) * parseInt(totalPage),
+            limit:parseInt(totalPage),
+            order
+        })
+    }
+    
     static async getData ({options,where}) {
         return await this.findAll({
             where:{
