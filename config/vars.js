@@ -10,7 +10,8 @@ module.exports = {
     jwtSecret: process.env.TOKEN_SECRET,
     nodeMailer: {
         email:process.env.NODEMAILER_EMAIL,
-        password:process.env.NODEMAILER_PASSWORD
+        password:process.env.NODEMAILER_PASSWORD,
+        service:process.env.NODEMAILER_SERVICE,
     },
     redisKey: 'rata'
 }

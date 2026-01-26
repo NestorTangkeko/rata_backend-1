@@ -1,9 +1,9 @@
 const nodemailer = require('nodemailer');
-const {email,password} =require('../../../config').nodeMailer;
+const {email,password,service} =require('../../../config').nodeMailer;
 const models = require('../../models/rata');
 
 const transporter = nodemailer.createTransport({
-    service:'Gmail',
+    service:service,
     auth:{
         user:email,
         pass:password
