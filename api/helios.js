@@ -87,6 +87,33 @@ router.post('/trips',async(req,res) => {
     }
 })
 
+router.post('/swift-invoices',async(req,res) => {
+    try{
+        const swiftInvoices = req.body;
+
+        if (!swiftInvoices || swiftInvoices.length === 0) {
+            return res.status(400).json({
+                message:`${e}`
+            })
+        }
+
+        await invoice.bulkCreateHeliosInvoices({
+            data: swiftInvoices
+        });
+
+        res.status(200).json({
+            data: swiftInvoices
+        })
+
+    }
+    catch(e){
+        console.log(e)
+        res.status(400).json({
+            message:`${e}`
+        })
+    }
+})
+
 
 
 // router.get('/draft-bill',async(req,res) => {
